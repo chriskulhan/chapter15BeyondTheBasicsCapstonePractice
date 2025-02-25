@@ -1,3 +1,5 @@
+#This is from Chapter 15 Object Oriented Programming and Classese
+
 class Wizcoin:
     def __init__(self, galleons, sickles, knuts):
         """Create a new Wizcoin object with galleons, sickles, and knuts."""
