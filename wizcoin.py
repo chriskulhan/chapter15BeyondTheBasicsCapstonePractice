@@ -1,4 +1,5 @@
-#This is from Chapter 15 Object Oriented Programming and Classese
+#This is from Chapter 15 Object Oriented Programming and Classes Book
+#(https://inventwithpython.com/beyond/chapter15.html)
 
 class Wizcoin:
     def __init__(self, galleons, sickles, knuts):

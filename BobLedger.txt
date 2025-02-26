@@ -1,0 +1,4 @@
+Withdraw 1000
+Balance is 999998000
+Withdraw 1000
+Balance is 999998000
