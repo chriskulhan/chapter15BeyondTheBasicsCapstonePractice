@@ -1,0 +1,487 @@
+
+Object-Oriented Programming and Classes (https://inventwithpython.com/beyond/chapter15.html)
+
+OOP is a programming language feature that allows you to group variables and functions together into new data types, called classes, from which you can create objects. By organizing your code into classes, you can break down a monolithic program into smaller parts that are easier to understand and debug.
+
+For small programs, OOP doesn’t add organization so much as it adds bureaucracy. Although some languages, such as Java, require you to organize all your code into classes, Python’s OOP features are optional. Programmers can take advantage of classes if they need them or ignore them if they don’t. Python core developer Jack Diederich’s PyCon 2012 talk, “Stop Writing Classes” (https://youtu.be/o9pEzgHorH0/), points out many cases where programmers write classes when a simpler function or module would have worked better.
+
+That said, as a programmer, you should be familiar with the basics of what classes are and how they work. In this chapter, you’ll learn what classes are, why they’re used in programs, and the syntax and programming concepts behind them. OOP is a broad topic, and this chapter acts only as an introduction.
+
+Real-World Analogy: Filling Out a Form
+You’ve most likely had to fill out paper or electronic forms numerous times in your life: for doctor’s visits, for online purchases, or to RSVP to a wedding. Forms exist as a uniform way for another person or organization to collect the information they need about you. Different forms ask for different kinds of information. You would report a sensitive medical condition on a doctor’s form, and you would report any guests you’re bringing on a wedding RSVP, but not the other way around.
+
+In Python, class, type, and data type have the same meaning. Like a paper or electronic form, a class is a blueprint for Python objects (also called instances), which contain the data that represents a noun. This noun could be a doctor’s patient, an ecommerce purchase, or a wedding guest. Classes are like a blank form template, and the objects created from that class are like filled-out forms that contain actual data about the kind of thing the form represents. For example, in Figure 15-1, the RSVP response form is like a class, whereas the filled-out RSVP is like an object.
+
+f15001
+Figure 15-1: Wedding RSVP form templates are like classes, and filled-out forms are like objects.
+
+You can also think of classes and objects as spreadsheets, as in Figure 15-2.
+
+f15002
+Figure 15-2: A spreadsheet of all RSVP data
+
+The column headers would make up the class, and the individual rows would each make up an object.
+
+Classes and objects are often talked about as data models of items in the real world, but don’t confuse the map for the territory. What goes into the class depends on what the program needs to do. Figure 15-3 shows some objects of different classes that represent the same real-world person, and other than the person’s name, they store completely different information.
+
+f15003
+Figure 15-3: Four objects made from different classes that represent the same real-world person, depending on what the software application needs to know about the person
+
+Also, the information contained in your classes should depend on your program’s needs. Many OOP tutorials use a Car class as their basic example without noting that what goes into a class depends entirely on the kind of software you’re writing. There’s no such thing as a generic Car class that would obviously have a honkHorn() method or a numberOfCupholders attribute just because those are characteristics real-world cars have. Your program might be for a car dealership web app, a car racing video game, or a road traffic simulation. The car dealership web app’s Car class might have milesPerGallon or manufacturersSuggestedRetailPrice attributes (just as a car dealership’s spreadsheets might use these as columns). But the video game and road traffic simulation wouldn’t have these attributes, because this information isn’t relevant to them. The video game’s Car class might have an explodeWithLargeFireball() method, but the car dealership and traffic simulation, hopefully, would not.
+
+Creating Objects from Classes
+You’ve already used classes and objects in Python, even if you haven’t created classes yourself. Consider the datetime module, which contains a class named date. Objects of the datetime.date class (also simply called datetime.date objects or date objects) represent a specific date. Enter the following in the interactive shell to create an object of the datetime.date class:
+
+>>> import datetime
+>>> birthday = datetime.date(1999, 10, 31) # Pass the year, month, and day.
+>>> birthday.year
+1999
+>>> birthday.month
+10
+>>> birthday.day
+31
+>>> birthday.weekday() # weekday() is a method; note the parentheses.
+6
+Attributes are variables associated with objects. The call to datetime.date() creates a new date object, initialized with the arguments 1999, 10, 31 so the object represents the date October 31, 1999. We assign these arguments as the date class’s year, month, and day attributes, which all date objects have.
+
+With this information, the class’s weekday() method can calculate the day of the week. In this example, it returns 6 for Sunday, because according to Python’s online documentation, the return value of weekday() is an integer that starts at 0 for Monday and goes to 6 for Sunday. The documentation lists several other methods that objects of the date class have. Even though the date object contains multiple attributes and methods, it’s still a single object that you can store in a variable, such as birthday in this example.
+
+Creating a Simple Class: WizCoin
+Let’s create a WizCoin class, which represents a number of coins in a fictional wizard currency. In this currency, the denominations are knuts, sickles (worth 29 knuts), and galleons (worth 17 sickles or 493 knuts). Keep in mind that the objects in the WizCoin class represent a quantity of coins, not an amount of money. For example, it will inform you that you’re holding five quarters and one dime rather than $1.35.
+
+In a new file named wizcoin.py, enter the following code to create the WizCoin class. Note that the __init__ method name has two underscores before and after init (we’ll discuss __init__ in “Methods, __init__(), and self” later in this chapter):
+
+1 class WizCoin:
+2     def __init__(self, galleons, sickles, knuts):
+        """Create a new WizCoin object with galleons, sickles, and knuts."""
+        self.galleons = galleons
+        self.sickles  = sickles
+        self.knuts    = knuts
+        # NOTE: __init__() methods NEVER have a return statement.
+
+3     def value(self):
+        """The value (in knuts) of all the coins in this WizCoin object."""
+        return (self.galleons * 17 * 29) + (self.sickles * 29) + (self.knuts)
+
+4     def weightInGrams(self):
+        """Returns the weight of the coins in grams."""
+        return (self.galleons * 31.103) + (self.sickles * 11.34) + (self.knuts * 5.0)
+This program defines a new class called WizCoin using a class statement 1. Creating a class creates a new type of object. Using a class statement to define a class is similar to def statements that define new functions. Inside the block of code following the class statement are the definitions for three methods: __init__() (short for initializer) 2, value() 3, and weightInGrams() 4. Note that all methods have a first parameter named self, which we’ll explore in the next section.
+
+As a convention, module names (like wizcoin in our wizcoin.py file) are lowercase, whereas class names (like WizCoin) begin with an uppercase letter. Unfortunately, some classes in the Python Standard Library, such as date, don’t follow this convention.
+
+To practice creating new objects of the WizCoin class, enter the following source code in a separate file editor window and save the file as wcexample1.py in the same folder as wizcoin.py:
+
+import wizcoin
+
+1 purse = wizcoin.WizCoin(2, 5, 99) # The ints are passed to __init__().
+print(purse)
+print('G:', purse.galleons, 'S:', purse.sickles, 'K:', purse.knuts)
+print('Total value:', purse.value())
+print('Weight:', purse.weightInGrams(), 'grams')
+
+print()
+
+2 coinJar = wizcoin.WizCoin(13, 0, 0) # The ints are passed to __init__().
+print(coinJar)
+print('G:', coinJar.galleons, 'S:', coinJar.sickles, 'K:', coinJar.knuts)
+print('Total value:', coinJar.value())
+print('Weight:', coinJar.weightInGrams(), 'grams')
+The calls to WizCoin() 1 2 create a WizCoin object and run the code in the __init__() method for them. We pass in three integers as arguments to WizCoin(), which are forwarded to the parameters of __init__(). These arguments are assigned to the object’s self.galleons, self.sickles, and self.knuts attributes. Note that, just as the time.sleep() function requires you to first import the time module and put time. before the function name, we must also import wizcoin and put wizcoin. before the WizCoin() function name.
+
+When you run this program, the output will look something like this:
+
+<wizcoin.WizCoin object at 0x000002136F138080>
+G: 2 S: 5 K: 99
+Total value: 1230
+Weight: 613.906 grams
+
+<wizcoin.WizCoin object at 0x000002136F138128>
+G: 13 S: 0 K: 0
+Total value: 6409
+Weight: 404.339 grams
+If you get an error message, such as ModuleNotFoundError: No module named 'wizcoin', check to make sure that your file is named wizcoin.py and that it’s in the same folder as wcexample1.py.
+
+The WizCoin objects don’t have useful string representations, so printing purse and coinJar displays a memory address in between angle brackets. (You’ll learn how to change this in Chapter 17.)
+
+Just as we can call the lower() string method on a string object, we can call the value() and weightInGrams() methods on the WizCoin objects we’ve assigned to the purse and coinJar variables. These methods calculate values based on the object’s galleons, sickles, and knuts attributes.
+
+Classes and OOP can lead to more maintainable code—that is, code that is easier to read, modify, and extend in the future. Let’s explore this class’s methods and attributes in more detail.
+
+Methods, __init__(), and self
+Methods are functions associated with objects of a particular class. Recall that lower() is a string method, meaning that it’s called on string objects. You can call lower() on a string, as in 'Hello'.lower(), but you can’t call it on a list, such as ['dog', 'cat'].lower(). Also, notice that methods come after the object: the correct code is 'Hello'.lower(), not lower('Hello'). Unlike a method like lower(), a function like len() is not associated with a single data type; you can pass strings, lists, dictionaries, and many other types of objects to len().
+
+As you saw in the previous section, we create objects by calling the class name as a function. This function is referred to as a constructor function (or constructor, or abbreviated as ctor, pronounced “see-tore”) because it constructs a new object. We also say the constructor instantiates a new instance of the class.
+
+Calling the constructor causes Python to create the new object and then run the __init__() method. Classes aren’t required to have an __init__() method, but they almost always do. The __init__() method is where you commonly set the initial values of attributes. For example, recall that the __init__() method of WizCoin looks like the following:
+
+    def __init__(self, galleons, sickles, knuts):
+        """Create a new WizCoin object with galleons, sickles, and knuts."""
+        self.galleons = galleons
+        self.sickles  = sickles
+        self.knuts    = knuts
+        # NOTE: __init__() methods NEVER have a return statement.
+When the wcexample1.py program calls WizCoin(2, 5, 99), Python creates a new WizCoin object and then passes three arguments (2, 5, and 99) to an __init__() call. But the __init__() method has four parameters: self, galleons, sickles, and knuts. The reason is that all methods have a first parameter named self. When a method is called on an object, the object is automatically passed in for the self parameter. The rest of the arguments are assigned to parameters normally. If you see an error message, such as TypeError: __init__() takes 3 positional arguments but 4 were given, you’ve probably forgotten to add the self parameter to the method’s def statement.
+
+You don’t have to name a method’s first parameter self; you can name it anything. But using self is conventional, and choosing a different name will make your code less readable to other Python programmers. When you’re reading code, the presence of self as the first parameter is the quickest way you can distinguish methods from functions. Similarly, if your method’s code never needs to use the self parameter, it’s a sign that your method should probably just be a function.
+
+The 2, 5, and 99 arguments of WizCoin(2, 5, 99) aren’t automatically assigned to the new object’s attributes; we need the three assignment statements in __init__() to do this. Often, the __init__() parameters are named the same as the attributes, but the presence of self in self.galleons indicates that it’s an attribute of the object, whereas galleons is a parameter. This storing of the constructor’s arguments in the object’s attributes is a common task for a class’s __init__() method. The datetime.date() call in the previous section did a similar task except the three arguments we passed were for the newly created date object’s year, month, and day attributes.
+
+You’ve previously called the int(), str(), float(), and bool() functions to convert between data types, such as str(3.1415) returning the string value '3.1415' based on the float value 3.1415. Previously, we described these as functions, but int, str, float, and bool are actually classes, and the int(), str(), float(), and bool() functions are constructor functions that return new integer, string, float, and Boolean objects. Python’s style guide recommends using capitalized camelcase for your class names (like WizCoin), although many of Python’s built-in classes don’t follow this convention.
+
+Note that calling the WizCoin() construction function returns the new WizCoin object, but the __init__() method never has a return statement with a return value. Adding a return value causes this error: TypeError: __init__() should return None.
+
+Attributes
+Attributes are variables associated with an object. The Python documentation describes attributes as “any name following a dot.” For example, consider the birthday.year expression in the previous section. The year attribute is a name following a dot.
+
+Every object has its own set of attributes. When the wcexample1.py program created two WizCoin objects and stored them in the purse and coinJar variables, their attributes had different values. You can access and set these attributes just like any variable. To practice setting attributes, open a new file editor window and enter the following code, saving it as wcexample2.py in the same folder as the wizcoin.py file:
+
+import wizcoin
+
+change = wizcoin.WizCoin(9, 7, 20)
+print(change.sickles) # Prints 7.
+change.sickles += 10
+print(change.sickles) # Prints 17.
+
+pile = wizcoin.WizCoin(2, 3, 31)
+print(pile.sickles) # Prints 3.
+pile.someNewAttribute = 'a new attr' # A new attribute is created.
+print(pile.someNewAttribute)
+When you run this program, the output looks like this:
+
+7
+17
+3
+a new attr
+You can think of an object’s attributes as similar to a dictionary’s keys. You can read and modify their associated values and assign an object new attributes. Technically, methods are considered attributes of a class, as well.
+
+Private Attributes and Private Methods
+In languages such as C++ or Java, attributes can be marked as having private access, which means the compiler or interpreter only lets code inside the class’s methods access or modify the attributes of objects of that class. But in Python, this enforcement doesn’t exist. All attributes and methods are effectively public access: code outside of the class can access and modify any attribute in any object of that class.
+
+But private access is useful. For example, objects of a BankAccount class could have a balance attribute that only methods of the BankAccount class should have access to. For those reasons, Python’s convention is to start private attribute or method names with a single underscore. Technically, there is nothing to stop code outside the class from accessing private attributes and methods, but it’s a best practice to let only the class’s methods access them.
+
+Open a new file editor window, enter the following code, and save it as privateExample.py. In it, objects of a BankAccount class have private _name and _balance attributes that only the deposit() and withdraw() methods should directly access:
+
+class BankAccount:
+    def __init__(self, accountHolder):
+        # BankAccount methods can access self._balance, but code outside of
+        # this class should not:
+1         self._balance = 0
+2         self._name = accountHolder
+        with open(self._name + 'Ledger.txt', 'w') as ledgerFile:
+            ledgerFile.write('Balance is 0\n')
+
+    def deposit(self, amount):
+3         if amount <= 0:
+            return # Don't allow negative "deposits".
+        self._balance += amount
+4         with open(self._name + 'Ledger.txt', 'a') as ledgerFile:
+            ledgerFile.write('Deposit ' + str(amount) + '\n')
+            ledgerFile.write('Balance is ' + str(self._balance) + '\n')
+
+    def withdraw(self, amount):
+5         if self._balance < amount or amount < 0:
+            return # Not enough in account, or withdraw is negative.
+        self._balance -= amount
+6         with open(self._name + 'Ledger.txt', 'a') as ledgerFile:
+            ledgerFile.write('Withdraw ' + str(amount) + '\n')
+            ledgerFile.write('Balance is ' + str(self._balance) + '\n')
+
+acct = BankAccount('Alice') # We create an account for Alice.
+acct.deposit(120) # _balance can be affected through deposit()
+acct.withdraw(40) # _balance can be affected through withdraw()
+
+# Changing _name or _balance outside of BankAccount is impolite, but allowed:
+7 acct._balance = 1000000000
+acct.withdraw(1000)
+
+8 acct._name = 'Bob' # Now we're modifying Bob's account ledger!
+acct.withdraw(1000) # This withdrawal is recorded in BobLedger.txt!
+When you run privateExample.py, the ledger files it creates are inaccurate because we modified the _balance and _name outside the class, which resulted in invalid states. AliceLedger.txt inexplicably has a lot of money in it:
+
+Balance is 0
+Deposit 120
+Balance is 120
+Withdraw 40
+Balance is 80
+Withdraw 1000
+Balance is 999999000
+Now there’s a BobLedger.txt file with an inexplicable account balance, even though we never created a BankAccount object for Bob:
+
+Withdraw 1000
+Balance is 999998000
+Well-designed classes will be mostly self-contained, providing methods to adjust the attributes to valid values. The _balance and _name attributes are marked as private 1 2, and the only valid way of adjusting the BankAccount class’s value is through the deposit() and withdraw() methods. These two methods have checks 3 5 to make sure _balance isn’t put into an invalid state (such as a negative integer value). These methods also record each transaction to account for the current balance 4 6.
+
+Code outside the class that modifies these attributes, such as acct._balance = 1000000000 7 or acct._name = 'Bob' 8 instructions, can put the object into an invalid state and introduce bugs (and audits from the bank examiner). By following the underscore prefix convention for private access, you make debugging easier. The reason is that you know the cause of the bug will be in the code in the class instead of anywhere in the entire program.
+
+Note that unlike Java and other languages, Python has no need for public getter and setter methods for private attributes. Instead Python uses properties, as explained in Chapter 17.
+
+The type() Function and __qualname__ Attribute
+Passing an object to the built-in type() function tells us the object’s data type through its return value. The objects returned from the type() function are type objects, also called class objects. Recall that the terms type, data type, and class all have the same meaning in Python. To see what the type() function returns for various values, enter the following into the interactive shell:
+
+>>> type(42)  # The object 42 has a type of int.
+<class 'int'>
+>>> int # int is a type object for the integer data type.
+<class 'int'>
+>>> type(42) == int  # Type check 42 to see if it is an integer.
+True
+>>> type('Hello') == int  # Type check 'Hello' against int.
+False
+>>> import wizcoin
+>>> type(42) == wizcoin.WizCoin  # Type check 42 against WizCoin.
+False
+>>> purse = wizcoin.WizCoin(2, 5, 10)
+>>> type(purse) == wizcoin.WizCoin # Type check purse against WizCoin.
+True
+Note that int is a type object and is the same kind of object as what type(42) returns, but it can also be called as the int() constructor function: the int('42') function doesn’t convert the '42' string argument; instead, it returns an integer object based on the argument.
+
+Say you need to log some information about the variables in your program to help you debug them later. You can only write strings to a logfile, but passing the type object to str() will return a rather messy-looking string. Instead, use the __qualname__ attribute, which all type objects have, to write a simpler, human-readable string:
+
+>>> str(type(42))  # Passing the type object to str() returns a messy string.
+"<class 'int'>"
+>>> type(42).__qualname__ # The __qualname__ attribute is nicer looking.
+'int'
+The __qualname__ attribute is most often used for overriding the __repr__() method, which is explained in more detail in Chapter 17.
+
+Non-OOP vs. OOP Examples: Tic-Tac-Toe
+At first, it can be difficult to see how to use classes in your programs. Let’s look at an example of a short tic-tac-toe program that doesn’t use classes, and then rewrite it so it does.
+
+Open a new file editor window and enter the following program; then save it as tictactoe.py:
+
+# tictactoe.py, A non-OOP tic-tac-toe game.
+
+ALL_SPACES = list('123456789')  # The keys for a TTT board dictionary.
+X, O, BLANK = 'X', 'O', ' '  # Constants for string values.
+
+def main():
+    """Runs a game of tic-tac-toe."""
+    print('Welcome to tic-tac-toe!')
+    gameBoard = getBlankBoard()  # Create a TTT board dictionary.
+    currentPlayer, nextPlayer = X, O  # X goes first, O goes next.
+
+    while True:
+        print(getBoardStr(gameBoard))  # Display the board on the screen.
+
+        # Keep asking the player until they enter a number 1-9:
+        move = None
+        while not isValidSpace(gameBoard, move):
+            print(f'What is {currentPlayer}\'s move? (1-9)')
+            move = input()
+        updateBoard(gameBoard, move, currentPlayer)  # Make the move.
+
+        # Check if the game is over:
+        if isWinner(gameBoard, currentPlayer):  # First check for victory.
+            print(getBoardStr(gameBoard))
+            print(currentPlayer + ' has won the game!')
+            break
+        elif isBoardFull(gameBoard):  # Next check for a tie.
+            print(getBoardStr(gameBoard))
+            print('The game is a tie!')
+            break
+        currentPlayer, nextPlayer = nextPlayer, currentPlayer  # Swap turns.
+    print('Thanks for playing!')
+
+def getBlankBoard():
+    """Create a new, blank tic-tac-toe board."""
+    board = {} # The board is represented as a Python dictionary.
+    for space in ALL_SPACES:
+        board[space] = BLANK  # All spaces start as blank.
+    return board
+
+def getBoardStr(board):
+    """Return a text-representation of the board."""
+    return f'''
+      {board['1']}|{board['2']}|{board['3']}  1 2 3
+      -+-+-
+      {board['4']}|{board['5']}|{board['6']}  4 5 6
+      -+-+-
+      {board['7']}|{board['8']}|{board['9']}  7 8 9'''
+
+def isValidSpace(board, space):
+    """Returns True if the space on the board is a valid space number
+    and the space is blank."""
+    return space in ALL_SPACES and board[space] == BLANK
+
+def isWinner(board, player):
+    """Return True if player is a winner on this TTTBoard."""
+    b, p = board, player # Shorter names as "syntactic sugar".
+    # Check for 3 marks across the 3 rows, 3 columns, and 2 diagonals.
+    return ((b['1'] == b['2'] == b['3'] == p) or # Across the top
+            (b['4'] == b['5'] == b['6'] == p) or # Across the middle
+            (b['7'] == b['8'] == b['9'] == p) or # Across the bottom
+            (b['1'] == b['4'] == b['7'] == p) or # Down the left
+            (b['2'] == b['5'] == b['8'] == p) or # Down the middle
+            (b['3'] == b['6'] == b['9'] == p) or # Down the right
+            (b['3'] == b['5'] == b['7'] == p) or # Diagonal
+            (b['1'] == b['5'] == b['9'] == p))   # Diagonal
+
+def isBoardFull(board):
+    """Return True if every space on the board has been taken."""
+    for space in ALL_SPACES:
+        if board[space] == BLANK:
+            return False  # If a single space is blank, return False.
+    return True  # No spaces are blank, so return True.
+
+def updateBoard(board, space, mark):
+    """Sets the space on the board to mark."""
+    board[space] = mark
+
+if __name__ == '__main__':
+    main() # Call main() if this module is run, but not when imported.
+When you run this program, the output will look something like this:
+
+Welcome to tic-tac-toe!
+
+       | |   1 2 3
+      -+-+-
+       | |   4 5 6
+      -+-+-
+       | |   7 8 9
+What is X's move? (1-9)
+1
+
+      X| |   1 2 3
+      -+-+-
+       | |   4 5 6
+      -+-+-
+       | |   7 8 9
+What is O's move? (1-9)
+--snip--
+      X| |O  1 2 3
+      -+-+-
+       |O|   4 5 6
+      -+-+-
+      X|O|X  7 8 9
+What is X's move? (1-9)
+4
+
+      X| |O  1 2 3
+      -+-+-
+      X|O|   4 5 6
+      -+-+-
+      X|O|X  7 8 9
+X has won the game!
+Thanks for playing!
+Briefly, this program works by using a dictionary object to represent the nine spaces on a tic-tac-toe board. The dictionary’s keys are the strings '1' through '9', and its values are the strings 'X', 'O', or ' '. The numbered spaces are in the same arrangement as a phone’s keypad.
+
+The functions in tictactoe.py do the following:
+
+The main() function contains the code that creates a new board data structure (stored in the gameBoard variable) and calls other functions in the program.
+The getBlankBoard() function returns a dictionary with the nine spaces set to ' ' for a blank board.
+The getBoardStr() function accepts a dictionary representing the board and returns a multiline string representation of the board that can be printed to the screen. This is what renders the tic-tac-toe board’s text that the game displays.
+The isValidSpace() function returns True if it’s passed a valid space number and that space is blank.
+The isWinner() function’s parameters accept a board dictionary and either 'X' or 'O' to determine whether that player has three marks in a row on the board.
+The isBoardFull() function determines whether the board has no blank spaces, meaning the game has ended. The updateBoard() function’s parameters accept a board dictionary, a space, and a player’s X or O mark and updates the dictionary.
+Notice that many of the functions accept the variable board as their first parameter. That means these functions are related to each other in that they all operate on a common data structure.
+
+When several functions in the code all operate on the same data structure, it’s usually best to group them together as the methods and attributes of a class. Let’s redesign this in the tictactoe.py program to use a TTTBoard class that will store the board dictionary in an attribute named spaces. The functions that had board as a parameter will become methods of our TTTBoard class and use the self parameter instead of a board parameter.
+
+Open a new file editor window, enter the following code, and save it as tictactoe_oop.py:
+
+# tictactoe_oop.py, an object-oriented tic-tac-toe game.
+
+ALL_SPACES = list('123456789')  # The keys for a TTT board.
+X, O, BLANK = 'X', 'O', ' '  # Constants for string values.
+
+def main():
+    """Runs a game of tic-tac-toe."""
+    print('Welcome to tic-tac-toe!')
+    gameBoard = TTTBoard()  # Create a TTT board object.
+    currentPlayer, nextPlayer = X, O # X goes first, O goes next.
+
+    while True:
+        print(gameBoard.getBoardStr())  # Display the board on the screen.
+
+        # Keep asking the player until they enter a number 1-9:
+        move = None
+        while not gameBoard.isValidSpace(move):
+            print(f'What is {currentPlayer}\'s move? (1-9)')
+            move = input()
+        gameBoard.updateBoard(move, currentPlayer)  # Make the move.
+
+        # Check if the game is over:
+        if gameBoard.isWinner(currentPlayer):  # First check for victory.
+            print(gameBoard.getBoardStr())
+            print(currentPlayer + ' has won the game!')
+            break
+        elif gameBoard.isBoardFull():  # Next check for a tie.
+            print(gameBoard.getBoardStr())
+            print('The game is a tie!')
+            break
+        currentPlayer, nextPlayer = nextPlayer, currentPlayer  # Swap turns.
+    print('Thanks for playing!')
+
+class TTTBoard:
+    def __init__(self, usePrettyBoard=False, useLogging=False):
+        """Create a new, blank tic tac toe board."""
+        self._spaces = {}  # The board is represented as a Python dictionary.
+        for space in ALL_SPACES:
+            self._spaces[space] = BLANK  # All spaces start as blank.
+
+    def getBoardStr(self):
+        """Return a text-representation of the board."""
+        return f'''
+      {self._spaces['1']}|{self._spaces['2']}|{self._spaces['3']}  1 2 3
+      -+-+-
+      {self._spaces['4']}|{self._spaces['5']}|{self._spaces['6']}  4 5 6
+      -+-+-
+      {self._spaces['7']}|{self._spaces['8']}|{self._spaces['9']}  7 8 9'''
+
+    def isValidSpace(self, space):
+        """Returns True if the space on the board is a valid space number
+        and the space is blank."""
+        return space in ALL_SPACES and self._spaces[space] == BLANK
+
+    def isWinner(self, player):
+        """Return True if player is a winner on this TTTBoard."""
+        s, p = self._spaces, player # Shorter names as "syntactic sugar".
+        # Check for 3 marks across the 3 rows, 3 columns, and 2 diagonals.
+        return ((s['1'] == s['2'] == s['3'] == p) or # Across the top
+                (s['4'] == s['5'] == s['6'] == p) or # Across the middle
+                (s['7'] == s['8'] == s['9'] == p) or # Across the bottom
+                (s['1'] == s['4'] == s['7'] == p) or # Down the left
+                (s['2'] == s['5'] == s['8'] == p) or # Down the middle
+                (s['3'] == s['6'] == s['9'] == p) or # Down the right
+                (s['3'] == s['5'] == s['7'] == p) or # Diagonal
+                (s['1'] == s['5'] == s['9'] == p))   # Diagonal
+
+    def isBoardFull(self):
+        """Return True if every space on the board has been taken."""
+        for space in ALL_SPACES:
+            if self._spaces[space] == BLANK:
+                return False  # If a single space is blank, return False.
+        return True  # No spaces are blank, so return True.
+
+    def updateBoard(self, space, player):
+        """Sets the space on the board to player."""
+        self._spaces[space] = player
+
+if __name__ == '__main__':
+    main() # Call main() if this module is run, but not when imported.
+Functionally, this program is the same as the non-OOP tic-tac-toe program. The output looks identical. We’ve moved the code that used to be in getBlankBoard() to the TTTBoard class’s __init__() method, because they perform the same task of preparing the board data structure. We converted the other functions into methods, with the self parameter replacing the old board parameter, because they also serve a similar purpose: they’re both blocks of code that operate on a tic-tac-toe board data structure.
+
+When the code in these methods needs to change the dictionary stored in the _spaces attribute, the code uses self._spaces. When the code in these methods need to call other methods, the calls would also be preceded by self and a period. This is similar to how coinJars.values() in “Creating a Simple Class: WizCoin” had an object in the coinJars variable. In this example, the object that has the method to call is in a self variable.
+
+Also, notice that the _spaces attribute begins with an underscore, meaning that only code inside the methods of TTTBoard should access or modify it. Code outside the class should only be able to modify _spaces indirectly by calling methods that modify it.
+
+It can be helpful to compare the source code of the two tic-tac-toe programs. You can compare the code in this book or view a side-by-side comparison at https://autbor.com/compareoop/.
+
+Tic-tac-toe is a small program, so it doesn’t take much effort to understand. But what if this program were tens of thousands of lines long with hundreds of different functions? A program with a few dozen classes would be easier to understand than a program with several hundred disparate functions. OOP breaks down a complicated program into easier-to-understand chunks.
+
+Designing Classes for the Real World Is Hard
+Designing a class, just like designing a paper form, seems deceptively straightforward. Forms and classes are, by their nature, simplifications of the real-world objects they represent. The question is, how should we simplify these objects? For example, if we’re creating a Customer class, the customer should have a firstName and lastName attribute, right? But actually creating classes to model real-world objects can be tricky. In most Western countries, a person’s last name is their family name, but in China, the family name is first. If we don’t want to exclude more than one billion potential customers, how should we change our Customer class? Should we change firstName and lastName to givenName and familyName? But some cultures don’t use family names. For example, former UN Secretary General U Thant, who is Burmese, has no family name: Thant is his given name and U is an initialization of his father’s given name. We might want to record the customer’s age, but an age attribute would soon become out of date; instead, it’s best to calculate the age each time you need it using a birthdate attribute.
+
+The real world is complicated, and designing forms and classes to capture this complexity in a uniform structure on which our programs can operate is difficult. Phone number formats vary between countries. ZIP codes don’t apply to addresses outside the United States. Setting a maximum number of characters for city names could be a problem for the German hamlet of Schmedeswurtherwesterdeich. In Australia and New Zealand, your legally recognized gender can be X. A platypus is a mammal that lays eggs. A peanut is not a nut. A hotdog might or might not be a sandwich, depending on who you ask. As a programmer writing programs for use in the real world, you’ll have to navigate this complexity.
+
+To learn more about this topic, I recommend the PyCon 2015 talk “Schemas for the Real World” by Carina C. Zona at https://youtu.be/PYYfVqtcWQY/ and the North Bay Python 2018 talk “Hi! My name is . . .” by James Bennett at https://youtu.be/NIebelIpdYk/. There are also popular “Falsehoods Programmers Believe” blog posts, such as “Falsehoods Programmers Believe About Names” and “Falsehoods Programmers Believe About Time Zones.” These blog posts also cover topics like maps, email addresses, and many more kinds of data that programmers often poorly represent. You’ll find a collection of links to these articles at https://github.com/kdeldycke/awesome-falsehood/. Additionally, you’ll find a good example of a poorly executed method of capturing real-world complexity in CGP Grey’s video, “Social Security Cards Explained,” at https://youtu.be/Erp8IAUouus/.
+
+Summary
+OOP is a useful feature for organizing your code. Classes allow you to group together data and code into new data types. You can also create objects from these classes by calling their constructors (the class’s name called as a function), which in turn, calls the class’s __init__() method. Methods are functions associated with objects, and attributes are variables associated with objects. All methods have a self parameter as their first parameter, which is assigned the object when the method is called. This allows the methods to read or set the object’s attributes and call its methods.
+
+Although Python doesn’t allow you to specify private or public access for attributes, it does have a convention of using an underscore prefix for any methods or attributes that should only be called or accessed from the class’s own methods. By following this convention, you can avoid misusing the class and setting it into an invalid state that could cause bugs. Calling type(obj) will return the obj type’s class object. Class objects have a __qualname___ attribute, which contains a string with a human-readable form of the class’s name.
+
+At this point, you might be thinking, why we should bother using classes, attributes, and methods when we could do the same task with functions? OOP is a useful way to organize your code into more than just a .py file with 100 functions in it. By breaking up your program into several well-designed classes, you can focus on each class separately.
+
+OOP is an approach that focuses on data structures and the methods to handle those data structures. This approach isn’t mandatory for every program, and it’s certainly possible to overuse OOP. But OOP provides opportunities to use many advanced features that we’ll explore in the next two chapters. The first of these features is inheritance, which we’ll delve into in the next chapter.
+
+Prev: Chapter 14 - Practice Projects | Next: Chapter 16 - Object-Oriented Programming and Inheritance

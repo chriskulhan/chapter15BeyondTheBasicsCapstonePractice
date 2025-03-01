@@ -94,3 +94,5 @@ def updateBoard(board, space, mark):
 
 if __name__ == '__main__':
     main() # Call main() if this module is run, but not when imported.
+
+    # compare to ticTacToe_oop.py here: https://autbor.com/compareoop/#diff
